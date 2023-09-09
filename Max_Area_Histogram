@@ -1,0 +1,56 @@
+//Approach :
+//To choose the leftmost rect we can find the nearest smaller left and similarly nearest smaller right using the stack in O(N).
+//Store their indices in two vectors, say left and right.
+//If there is no smaller rect in the left we can use -1 as index and for right len as index.
+//Width will be equal to the right - left - 1.
+//Now traverse the heights array and calculate the area for every rect and store the max_area.
+//Complexity :
+//Time complexity:O(N)
+//Space complexity:O(N)
+
+class Solution
+{
+    public:
+    //Function to find largest rectangular area possible in a given histogram.
+    long long getMaxArea(long long arr[], int n) {
+    // Your code here
+    vector<long long> left(n, -1), right(n, n);
+    stack<pair<long long, long long>> st;
+
+    // storing the indices of nearest smaller left for each element
+    for (long long in = 0; in < n; ++in) {
+        if (!st.empty() && st.top().second < arr[in]) {
+            left[in] = st.top().first;
+        } else if (!st.empty() && st.top().second >= arr[in]) {
+            while (!st.empty() && st.top().second >= arr[in])
+                st.pop();
+            if (!st.empty())
+                left[in] = st.top().first;
+        }
+        st.push({in, arr[in]});
+    }
+
+    st = stack<pair<long long, long long>>();
+
+    // storing the indices of nearest right element for each element
+    for (long long in = n - 1; in >= 0; in--) {
+        if (!st.empty() && st.top().second < arr[in]) {
+            right[in] = st.top().first;
+        } else if (!st.empty() && st.top().second >= arr[in]) {
+            while (!st.empty() && st.top().second >= arr[in])
+                st.pop();
+            if (!st.empty())
+                right[in] = st.top().first;
+        }
+        st.push({in, arr[in]});
+    }
+
+    // calculate area for every rectangle by combining the nearer left and rigt and store the maximum area.
+    long long max_area = 0;
+    for (long long in = 0; in < n; ++in) {
+        long long area = arr[in] * (right[in] - left[in] - 1);
+        max_area = max(max_area, area);
+    }
+    return max_area;
+}
+};
